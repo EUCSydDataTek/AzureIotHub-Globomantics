@@ -3,14 +3,18 @@ using Microsoft.Azure.Devices.Client;
 using Microsoft.Azure.Devices.Shared;
 using System.Text;
 using System.Text.Json;
+using Microsoft.Extensions.Configuration;
+using System.Reflection;
 
-// Findes som primary connectionstring for den enkelte device
-const string DeviceConnectionString = "HostName=IoTHubECR.azure-devices.net;DeviceId=my-device-id;SharedAccessKey=FPR92/gYb0yjaIyw8iTStews4CbvWeI1qV2M2MnLaKc=";
+// Hentes fra User Secrets. Findes som primary connectionstring for den enkelte device
 
+var configuration = new ConfigurationBuilder()
+    .AddUserSecrets(Assembly.GetExecutingAssembly())
+    .Build();
 
 Console.WriteLine("Initializing Band Agent...");
 
-var device = DeviceClient.CreateFromConnectionString(DeviceConnectionString);
+var device = DeviceClient.CreateFromConnectionString(configuration["DeviceConnectionString"]);
 
 await device.OpenAsync();
 
