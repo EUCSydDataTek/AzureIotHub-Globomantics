@@ -44,8 +44,8 @@ for (int i = 0; i < 10; i++)
 #region Sending Device Twin messages to Cloud
 // Kan kontrolleres vha. Azure IoT Explorer eller i Portal
 //var twinProperties = new TwinCollection();
-//twinProperties["connection-type"] = "wi-fi";
-//twinProperties["connection-strength"] = "full";
+//twinProperties["connectionType"] = "wi-fi";
+//twinProperties["connectionStrength"] = "full";
 
 //await device.UpdateReportedPropertiesAsync(twinProperties);
 #endregion
