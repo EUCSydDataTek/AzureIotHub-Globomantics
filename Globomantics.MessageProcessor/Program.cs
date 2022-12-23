@@ -1,5 +1,4 @@
-﻿using MessageProcessor;
-using Microsoft.Azure.EventHubs;
+﻿using Microsoft.Azure.EventHubs;
 using Microsoft.Azure.EventHubs.Processor;
 using Microsoft.Extensions.Configuration;
 using System.Reflection;

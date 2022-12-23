@@ -1,4 +1,5 @@
-﻿using Microsoft.Azure.EventHubs;
+﻿using Common;
+using Microsoft.Azure.EventHubs;
 using Microsoft.Azure.EventHubs.Processor;
 using Newtonsoft.Json;
 using System.Text;
@@ -42,15 +43,15 @@ public class LoggingEventProcessor : IEventProcessor
                               $"device ID: '{deviceId}', " +
                               $"payload: '{payload}'");
 
-            //var telemetry = JsonConvert.DeserializeObject<Telemetry>(payload);
+            var telemetry = JsonConvert.DeserializeObject<Telemetry>(payload);
 
-            //    if (telemetry.Status == StatusType.Emergency)
-            //    {
-            //        Console.WriteLine($"Guest requires emergency assistance! Device ID: {deviceId}");
-            //        SendFirstRespondersTo(telemetry.Latitude, telemetry.Longitude);
-            //    }
+            if (telemetry.Status == StatusType.Emergency)
+            {
+                Console.WriteLine($"Guest requires emergency assistance! Device ID: {deviceId}");
+                SendFirstRespondersTo(telemetry.Latitude, telemetry.Longitude);
+            }
         }
-        //return Task.CompletedTask;
+
         return context.CheckpointAsync();
     }
 
