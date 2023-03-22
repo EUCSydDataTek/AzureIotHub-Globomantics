@@ -2,6 +2,23 @@
 
 ## BandAgent
 
+Device: `my-device-id`
+
+Connectionstring findes som *Primary Connectionstring* for my-device-id devicen og er anbragt i *User Secrets*.
+
+Testes med Azure IoT Explorer, som monitorerer *Event Hub*.
+
+Menu i BandAgent:
+
+> q: quits
+> 
+> h: send happy feedback
+> 
+> u: send unhappy feedback
+> 
+> e: request emergency help
+
+
 
 ## MessageProcessor
 

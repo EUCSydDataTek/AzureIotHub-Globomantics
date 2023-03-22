@@ -14,7 +14,7 @@ var configuration = new ConfigurationBuilder()
 
 Console.WriteLine("Initializing Band Agent...");
 
-var device = DeviceClient.CreateFromConnectionString(configuration["DeviceConnectionString"]);
+var device = DeviceClient.CreateFromConnectionString(configuration["DeviceConnectionString"], TransportType.Amqp );
 
 await device.OpenAsync();
 
@@ -85,7 +85,7 @@ Console.ReadKey();
 static async Task UpdateTwin(DeviceClient device)
 {
     var twinProperties = new TwinCollection();
-    twinProperties["connectionType"] = "wi-fi";
+    twinProperties["connectionType"] = "wifi";
     twinProperties["connectionStrength"] = "full";
 
     await device.UpdateReportedPropertiesAsync(twinProperties);
