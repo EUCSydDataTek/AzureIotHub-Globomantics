@@ -6,6 +6,8 @@ using Microsoft.Extensions.Configuration;
 using System.Reflection;
 using Common;
 
+//Send messages from the cloud to your device with IoT Hub (.NET) https://learn.microsoft.com/en-us/azure/iot-hub/iot-hub-csharp-csharp-c2d)
+
 // Hentes fra User Secrets. Findes som primary connectionstring for den enkelte device
 
 var configuration = new ConfigurationBuilder()
@@ -17,6 +19,7 @@ Console.WriteLine("Initializing Band Agent...");
 var device = DeviceClient.CreateFromConnectionString(configuration["DeviceConnectionString"]);
 
 await device.OpenAsync();
+Task receiveEventsTask = ReceiveEventsTask(device);     //
 
 Console.WriteLine("Device is connected!");
 
@@ -89,4 +92,19 @@ static async Task UpdateTwin(DeviceClient device)
     twinProperties["connectionStrength"] = "full";
 
     await device.UpdateReportedPropertiesAsync(twinProperties);
+}
+
+static async Task ReceiveEventsTask(DeviceClient device)    //
+{
+    while (true)
+    {
+        Message message = await device.ReceiveAsync();
+
+        if (message == null) continue;
+
+        string payload = Encoding.ASCII.GetString(message.GetBytes());
+        Console.WriteLine($"Received message from cloud: {payload}");
+
+        await device.CompleteAsync(message);
+    }
 }
