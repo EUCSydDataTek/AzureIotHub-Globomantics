@@ -33,3 +33,5 @@ await processor.RegisterEventProcessorAsync<LoggingEventProcessor>();
 
 Console.WriteLine("Event processor started, press enter to exit...");
 Console.ReadLine();
+
+await processor.UnregisterEventProcessorAsync();

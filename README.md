@@ -22,7 +22,13 @@ Menu i BandAgent:
 
 ## 2. MessageProcessor
 
-MessageProcessor og BandAgent sættes til Multiple Startup. Når der sendes forskellige meddelelser fra BandAgent bliver de hentet fra EventHub og vist vha. MessageProcessor.
+Uden deserilization af Json og med `return Task.CompletedTask`:
+
+1. Start MessageProcessor og send 10 messages fra VSCode.
+2. Stop og start igen og se at alle 10 messages stadig ligger i EventHub.
+3. Udskift `Task.CompletedTask` med `return context.CheckpointAsync()`
+4. Start MessageProcessor igen - alle 10 vises stadig
+5. Start MessageProcessor igen - og denne gang flyttes checkpoint korrekt.
 
 &nbsp;
 
@@ -45,3 +51,11 @@ Det er horizontal scaling!
 
 Bemærk: luk ikke processors ned ved blot at lukke vinduet! Så laves der ikke cleanup og leases sættes ikke fri
 før der er gået lidt tid!
+
+&nbsp;
+
+## 4. Device-to-Cloud Messages
+
+Indkommentér Deserilization-koden ind i `LoggingEventProcessor` klassen.
+
+MessageProcessor og BandAgent sættes til Multiple Startup. Når der sendes forskellige meddelelser fra BandAgent bliver de hentet fra EventHub, deserilizeret til Telemetry-klassen og vist vha. MessageProcessor.

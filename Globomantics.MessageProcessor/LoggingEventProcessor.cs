@@ -45,13 +45,14 @@ public class LoggingEventProcessor : IEventProcessor
                                   $"device ID: '{deviceId}', " +
                                   $"payload: '{payload}'");
 
-                var telemetry = JsonConvert.DeserializeObject<Telemetry>(payload);
+                // 4. Device-to-Cloud Messages
+                //var telemetry = JsonConvert.DeserializeObject<Telemetry>(payload);
 
-                if (telemetry.Status == StatusType.Emergency)
-                {
-                    Console.WriteLine($"Guest requires emergency assistance! Device ID: {deviceId}");
-                    SendFirstRespondersTo(telemetry.Latitude, telemetry.Longitude);
-                }
+                //if (telemetry.Status == StatusType.Emergency)
+                //{
+                //    Console.WriteLine($"Guest requires emergency assistance! Device ID: {deviceId}");
+                //    SendFirstRespondersTo(telemetry.Latitude, telemetry.Longitude);
+                //}
             }
         }
         catch (Exception ex)
@@ -59,12 +60,12 @@ public class LoggingEventProcessor : IEventProcessor
             Console.WriteLine($"Error: {ex.Message}");
         }
 
-        return context.CheckpointAsync();
+        return Task.CompletedTask;        // 2. MessageProcessor
+        //return context.CheckpointAsync();
     }
 
     private void SendFirstRespondersTo(decimal latitude, decimal longitude)
     {
-        //In a real app, this is where we would send a command or notification!
         Console.WriteLine($"**First responders dispatched to ({latitude}, {longitude})!**");
     }
 }
