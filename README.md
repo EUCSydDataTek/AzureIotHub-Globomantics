@@ -1,6 +1,6 @@
 # Globomantics
 
-## BandAgent
+## 1. BandAgent
 
 Device: `my-device-id`
 
@@ -20,13 +20,15 @@ Menu i BandAgent:
 
 &nbsp;
 
-## MessageProcessor
+## 2. MessageProcessor
 
 MessageProcessor og BandAgent sættes til Multiple Startup. Når der sendes forskellige meddelelser fra BandAgent bliver de hentet fra EventHub og vist vha. MessageProcessor.
 
 &nbsp;
 
-#### Horizontal scaling
+## 3. Horizontal scaling
+
+Sæt Message Processor til Startup project.
 
 1. Tryk Ctrl + F5 for at starte første instance af Message Processor.
 
@@ -38,7 +40,7 @@ De er nu balancerede og hver host tager sig af sin egen partition.
 Vi har nu flere processors end partitions (free hub = 2 partitioner).
 
 4. Stop nu den første processor med ENTER og vent.
-På et tidspunkt overtager processor #3 partition 0 og partition #3 overtager partition 1.
+På et tidspunkt (op til 1 minut) overtager processor #3 partition 0 og partition #3 overtager partition 1.
 Det er horizontal scaling!
 
 Bemærk: luk ikke processors ned ved blot at lukke vinduet! Så laves der ikke cleanup og leases sættes ikke fri
