@@ -4,7 +4,7 @@ using Microsoft.Extensions.Configuration;
 using System.Reflection;
 
 /*   HubName og IoTHubConnectionstring findes her: Hub settings | Built-in endpoints | Event Hub-compatible name and endpoint
-     Der er oprettet en ny Blob Container, der kaldes message-processor-host
+     Inden projektet kan køres, skal der oprettes en ny Blob Container, der kaldes message-processor-host og gemmer checkpoints for EventHub.
      StorageConnectionString og Name findes Her: iothubecrstorage | Access keys
 
      IoTHubConnectionString, StorageConnectionString og HubName hentes fra User Secrets med følgende format:
