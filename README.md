@@ -18,9 +18,13 @@ Menu i BandAgent:
 > 
 > e: request emergency help
 
-
+&nbsp;
 
 ## MessageProcessor
+
+MessageProcessor og BandAgent sættes til Multiple Startup. Når der sendes forskellige meddelelser fra BandAgent bliver de hentet fra EventHub og vist vha. MessageProcessor.
+
+&nbsp;
 
 #### Horizontal scaling
 

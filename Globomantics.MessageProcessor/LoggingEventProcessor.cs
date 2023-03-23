@@ -31,25 +31,32 @@ public class LoggingEventProcessor : IEventProcessor
     {
         Console.WriteLine($"Batch of events received on partition '{context.PartitionId}'.");
 
-        foreach (var eventData in messages)
+        try
         {
-            var payload = Encoding.ASCII.GetString(eventData.Body.Array!,
-                eventData.Body.Offset,
-                eventData.Body.Count);
-
-            var deviceId = eventData.SystemProperties["iothub-connection-device-id"];
-
-            Console.WriteLine($"Message received on partition '{context.PartitionId}', " +
-                              $"device ID: '{deviceId}', " +
-                              $"payload: '{payload}'");
-
-            var telemetry = JsonConvert.DeserializeObject<Telemetry>(payload);
-
-            if (telemetry.Status == StatusType.Emergency)
+            foreach (var eventData in messages)
             {
-                Console.WriteLine($"Guest requires emergency assistance! Device ID: {deviceId}");
-                SendFirstRespondersTo(telemetry.Latitude, telemetry.Longitude);
+                var payload = Encoding.ASCII.GetString(eventData.Body.Array!,
+                    eventData.Body.Offset,
+                    eventData.Body.Count);
+
+                var deviceId = eventData.SystemProperties["iothub-connection-device-id"];
+
+                Console.WriteLine($"Message received on partition '{context.PartitionId}', " +
+                                  $"device ID: '{deviceId}', " +
+                                  $"payload: '{payload}'");
+
+                var telemetry = JsonConvert.DeserializeObject<Telemetry>(payload);
+
+                if (telemetry.Status == StatusType.Emergency)
+                {
+                    Console.WriteLine($"Guest requires emergency assistance! Device ID: {deviceId}");
+                    SendFirstRespondersTo(telemetry.Latitude, telemetry.Longitude);
+                }
             }
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"Error: {ex.Message}");
         }
 
         return context.CheckpointAsync();
