@@ -24,7 +24,7 @@ Task receiveEventsTask = ReceiveEventsTask(device);     // Added #1
 
 await device.SetMethodHandlerAsync("showMessage", ShowMessage, null); // Added #4
 
-//await _device.SetMethodDefaultHandlerAsync(OtherDeviceMethod, null);
+await device.SetMethodDefaultHandlerAsync(OtherDeviceMethod, null); // Added #4
 
 Console.WriteLine("Device is connected!");
 
@@ -118,7 +118,7 @@ static async Task ReceiveEventsTask(DeviceClient device)    // Added #1
     }
 }
 
-
+#region DIRECT METHODS
 static Task<MethodResponse> ShowMessage(MethodRequest methodRequest, object userContext)
 {
     Console.WriteLine("*** MESSAGE RECEIVED ***");
@@ -130,18 +130,17 @@ static Task<MethodResponse> ShowMessage(MethodRequest methodRequest, object user
 }
 
 
-//static Task<MethodResponse> OtherDeviceMethod(
-//    MethodRequest methodRequest,
-//    object userContext)
-//{
-//    Console.WriteLine("****OTHER DEVICE METHOD CALLED****");
-//    Console.WriteLine($"Method: {methodRequest.Name}");
-//    Console.WriteLine($"Payload: {methodRequest.DataAsJson}");
+static Task<MethodResponse> OtherDeviceMethod(MethodRequest methodRequest, object userContext)
+{
+    Console.WriteLine("****OTHER DEVICE METHOD CALLED****");
+    Console.WriteLine($"Method: {methodRequest.Name}");
+    Console.WriteLine($"Payload: {methodRequest.DataAsJson}");
 
-//    var responsePayload = Encoding.ASCII.GetBytes("{\"response\": \"The method is not implemented!\"}");
+    var responsePayload = Encoding.ASCII.GetBytes("{\"response\": \"The method is not implemented!\"}");
 
-//    return Task.FromResult(new MethodResponse(responsePayload, 404));
-//}
+    return Task.FromResult(new MethodResponse(responsePayload, 404));
+}
+#endregion
 
 //static Task UpdateProperties(
 //    TwinCollection desiredProperties,

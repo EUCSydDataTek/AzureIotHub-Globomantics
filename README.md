@@ -50,6 +50,25 @@ Indkommentér metoden ReceiveFeedback() og test:
 
 ## 4. Receiving Direct Method Calls
 
-Indkommentér metoden ShowMessage().
+1. Indkommentér metoden `ShowMessage()`.
 
-Start *BandAgent* og benyt *IoT Hub Explorer* til at kalde **showMessage** som en Direct Method på `my-device-id`.
+2. Start *BandAgent* og benyt *IoT Hub Explorer* til at kalde **showMessage** med en Payload-message, som en Direct Method på `my-device-id`.
+
+3. Prøv også at kalde **showUnknownMessage** og bemærk en HTTP 501
+
+4. Indkommentér metoden `OtherDeviceMethod()`.
+
+5. Start *BandAgent* og benyt *IoT Hub Explorer* til at kalde **showUnknownMessage** med en Payload-message, som en Direct Method på `my-device-id`.
+
+&nbsp;
+
+## 5. Call Direct Method from BandManager
+
+1. Indkommentér metoden `CallDirectMethod()` i BandManager.
+2. Start både BandAgent og BandMangeger og send til `my-device-id`. Virker desværre ikke!
+
+&nbsp;
+
+## 6. Device Twins
+
+

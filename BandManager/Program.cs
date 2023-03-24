@@ -21,7 +21,11 @@ while (true)
     Console.Write("> ");
     string? deviceId = Console.ReadLine();
 
-    await SendCloudToDeviceMessage(serviceClient, deviceId);
+    // await SendCloudToDeviceMessage(serviceClient, deviceId);     // #4
+
+    await CallDirectMethod(serviceClient, deviceId);                // #5
+
+    //await UpdateDeviceFirmware(registryManager, deviceId);
 }
 
 async Task SendCloudToDeviceMessage(ServiceClient serviceClient, string? deviceId)
@@ -59,4 +63,15 @@ static async Task ReceiveFeedback(ServiceClient serviceClient)      // 3. Feedba
         }
         await feedbackReceiver.CompleteAsync(feedbackBatch);
     }
+}
+
+static async Task CallDirectMethod(ServiceClient serviceClient, string deviceId)
+{
+    var method = new CloudToDeviceMethod("showMessage");
+
+    method.SetPayloadJson("'Hello from C#'");
+
+    var response = await serviceClient.InvokeDeviceMethodAsync(deviceId, method);
+
+    Console.WriteLine($"Response status: {response.Status}, payload: {response.GetPayloadAsJson()}");
 }
