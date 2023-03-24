@@ -1,24 +1,42 @@
-# Globomantics
+# 2.Cloud-to-Device-Messaging
 
-## BandAgent
+## 1. Sending messages to an IoT Device
 
+Følgende metode tilføjes **BandAgent**:
 
-## MessageProcessor
+```csharp
+static async Task ReceiveEventsTask(DeviceClient device)    // Added #1
+{
+    while (true)
+    {
+        Message message = await device.ReceiveAsync();
 
-#### Horizontal scaling
+        if (message == null) continue;
 
-1. Tryk Ctrl + F5 for at starte første instance af Message Processor.
+        string payload = Encoding.ASCII.GetString(message.GetBytes());
+        Console.WriteLine($"Received message from cloud: {payload}");
 
-2. Tryk Ctrl + F5 for at starte endnu en instance af Message Processor. 
-Bemærk at den tager den ene partition, som den første host så giver slip på (LeaseLost).
-De er nu balancerede og hver host tager sig af sin egen partition.
+        //await device.RejectAsync(message);
+        //await device.AbandonAsync(message);
+        await device.CompleteAsync(message);
+    }
+}
+```
 
-3. Tryk Ctrl + F5 for at starte en 3. instance af Message Processor. Bemærk at den ikke starter op.
-Vi har nu flere processors end partitions (free hub = 2 partitioner).
+Test fra VSCode ved at sende en C2D Message to Device.
 
-4. Stop nu den første processor med ENTER og vent.
-På et tidspunkt overtager processor #3 partition 0 og partition #3 overtager partition 1.
-Det er horizontal scaling!
+&nbsp;
 
-Bemærk: luk ikke processors ned ved blot at lukke vinduet! Så laves der ikke cleanup og leases sættes ikke fri
-før der er gået lidt tid!
+## 2. Sending Messages from the Cloud
+
+En ny ConsoleApp kaldet **BandManager** er oprettet.
+
+I første omgang er kun metoden `SendCloudToDeviceMessage()` aktive.
+
+Test multiple startup af både BandAgent og BandManager projekterne og send en meddelelse til `my-device-id`. Den skal dukke op i BandAgent.
+
+Derefter lukkes for BandAgent og en ny meddelelse sendes - men her ved vi ikke om den er modtaget!
+
+&nbsp;
+
+## 3. Using Message Feedback

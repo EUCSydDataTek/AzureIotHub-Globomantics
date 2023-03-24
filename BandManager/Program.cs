@@ -8,6 +8,8 @@ using Microsoft.Extensions.Configuration;
 using System.Reflection;
 using System.Text;
 
+// Connectionstring hentes fra User Secrets. Findes under IoT-Hub | Shared access policies | Service | Connection string - primary key
+
 var configuration = new ConfigurationBuilder()
     .AddUserSecrets(Assembly.GetExecutingAssembly())
     .Build();
@@ -15,7 +17,8 @@ var configuration = new ConfigurationBuilder()
 Console.WriteLine("Initializing Band Agent...");
 
 var serviceClient = ServiceClient.CreateFromConnectionString(configuration["ServiceConnectionString"]);
-var feedbackTask = ReceiveFeedback(serviceClient);
+
+//var feedbackTask = ReceiveFeedback(serviceClient);    // 1. Uden feedback
 
 while (true)
 {
@@ -40,6 +43,7 @@ async Task SendCloudToDeviceMessage(ServiceClient serviceClient, string? deviceI
 
     await serviceClient.SendAsync(deviceId, commandMessage);
 }
+
 
 static async Task ReceiveFeedback(ServiceClient serviceClient)
 {
