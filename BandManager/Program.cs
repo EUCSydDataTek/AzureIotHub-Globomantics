@@ -1,9 +1,4 @@
-﻿
-// Nået til 6. Direct Message Overview https://app.pluralsight.com/course-player?clipId=f1215bae-9cdb-4900-9a3d-fad64b2ae1cd)
-
-// Send a cloud-to-device message (https://learn.microsoft.com/en-us/azure/iot-hub/iot-hub-csharp-csharp-c2d#send-a-cloud-to-device-message)
-
-using Microsoft.Azure.Devices;
+﻿using Microsoft.Azure.Devices;
 using Microsoft.Extensions.Configuration;
 using System.Reflection;
 using System.Text;
@@ -18,7 +13,7 @@ Console.WriteLine("Initializing Band Agent...");
 
 var serviceClient = ServiceClient.CreateFromConnectionString(configuration["ServiceConnectionString"]);
 
-//var feedbackTask = ReceiveFeedback(serviceClient);    // 1. Uden feedback
+var feedbackTask = ReceiveFeedback(serviceClient);    // 2. Uden feedback
 
 while (true)
 {
@@ -45,7 +40,7 @@ async Task SendCloudToDeviceMessage(ServiceClient serviceClient, string? deviceI
 }
 
 
-static async Task ReceiveFeedback(ServiceClient serviceClient)
+static async Task ReceiveFeedback(ServiceClient serviceClient)      // 3. Feedback
 {
     var feedbackReceiver = serviceClient.GetFeedbackReceiver();
 

@@ -1,6 +1,6 @@
 # 2.Cloud-to-Device-Messaging
 
-## 1. Sending messages to an IoT Device
+## 1. Receiving Messages on a Device (BandAgent)
 
 Følgende metode tilføjes **BandAgent**:
 
@@ -40,3 +40,16 @@ Derefter lukkes for BandAgent og en ny meddelelse sendes - men her ved vi ikke o
 &nbsp;
 
 ## 3. Using Message Feedback
+
+Indkommentér metoden ReceiveFeedback() og test:
+
+- at meddelelsen bliver modtaget
+- at meddelelsen ikke bliver modtaget og timer ud
+
+&nbsp;
+
+## 4. Receiving Direct Method Calls
+
+Indkommentér metoden ShowMessage().
+
+Start *BandAgent* og benyt *IoT Hub Explorer* til at kalde **showMessage** som en Direct Method på `my-device-id`.

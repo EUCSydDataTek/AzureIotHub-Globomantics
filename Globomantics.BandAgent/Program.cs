@@ -19,11 +19,18 @@ Console.WriteLine("Initializing Band Agent...");
 var device = DeviceClient.CreateFromConnectionString(configuration["DeviceConnectionString"]);
 
 await device.OpenAsync();
+
 Task receiveEventsTask = ReceiveEventsTask(device);     // Added #1
+
+await device.SetMethodHandlerAsync("showMessage", ShowMessage, null); // Added #4
+
+//await _device.SetMethodDefaultHandlerAsync(OtherDeviceMethod, null);
 
 Console.WriteLine("Device is connected!");
 
 await UpdateTwin(device);
+
+//await _device.SetDesiredPropertyUpdateCallbackAsync(UpdateProperties, null);
 
 Console.WriteLine("Press a key to perform an action:");
 Console.WriteLine("q: quits");
@@ -110,3 +117,79 @@ static async Task ReceiveEventsTask(DeviceClient device)    // Added #1
         await device.CompleteAsync(message);
     }
 }
+
+
+static Task<MethodResponse> ShowMessage(MethodRequest methodRequest, object userContext)
+{
+    Console.WriteLine("*** MESSAGE RECEIVED ***");
+    Console.WriteLine(methodRequest.DataAsJson);
+
+    var responsePayload = Encoding.ASCII.GetBytes("{\"response\": \"Message shown!\"}");
+
+    return Task.FromResult(new MethodResponse(responsePayload, 200));
+}
+
+
+//static Task<MethodResponse> OtherDeviceMethod(
+//    MethodRequest methodRequest,
+//    object userContext)
+//{
+//    Console.WriteLine("****OTHER DEVICE METHOD CALLED****");
+//    Console.WriteLine($"Method: {methodRequest.Name}");
+//    Console.WriteLine($"Payload: {methodRequest.DataAsJson}");
+
+//    var responsePayload = Encoding.ASCII.GetBytes("{\"response\": \"The method is not implemented!\"}");
+
+//    return Task.FromResult(new MethodResponse(responsePayload, 404));
+//}
+
+//static Task UpdateProperties(
+//    TwinCollection desiredProperties,
+//    object userContext)
+//{
+//    var currentFirmwareVersion = (string)_reportedProperties["firmwareVersion"];
+//    var desiredFirmwareVersion = (string)desiredProperties["firmwareVersion"];
+
+//    if (currentFirmwareVersion != desiredFirmwareVersion)
+//    {
+//        Console.WriteLine($"Firmware update requested.  Current version: '{currentFirmwareVersion}', " +
+//                          $"requested version: '{desiredFirmwareVersion}'");
+
+//        ApplyFirmwareUpdate(desiredFirmwareVersion);
+//    }
+
+//    return Task.CompletedTask;
+//}
+
+//static async Task ApplyFirmwareUpdate(string targetVersion)
+//{
+//    Console.WriteLine("Beginning firmware update...");
+
+//    _reportedProperties["firmwareUpdateStatus"] =
+//        $"Downloading zip file for firmware {targetVersion}...";
+//    await _device.UpdateReportedPropertiesAsync(_reportedProperties);
+//    Thread.Sleep(5000);
+
+//    _reportedProperties["firmwareUpdateStatus"] = "Unzipping package...";
+//    await _device.UpdateReportedPropertiesAsync(_reportedProperties);
+//    Thread.Sleep(5000);
+
+//    _reportedProperties["firmwareUpdateStatus"] = "Applying update...";
+//    await _device.UpdateReportedPropertiesAsync(_reportedProperties);
+//    Thread.Sleep(5000);
+
+//    Console.WriteLine("Firmware update complete!");
+
+//    _reportedProperties["firmwareUpdateStatus"] = "n/a";
+//    _reportedProperties["firmwareVersion"] = targetVersion;
+//    await _device.UpdateReportedPropertiesAsync(_reportedProperties);
+//}
+
+//private static async Task UpdateTwin(DeviceClient device)
+//{
+//    _reportedProperties = new TwinCollection();
+//    _reportedProperties["firmwareVersion"] = "1.0";
+//    _reportedProperties["firmwareUpdateStatus"] = "n/a";
+
+//    await device.UpdateReportedPropertiesAsync(_reportedProperties);
+//}
