@@ -1,5 +1,7 @@
 ﻿using Microsoft.Azure.Devices;
+using Microsoft.Azure.Devices.Shared;
 using Microsoft.Extensions.Configuration;
+using Newtonsoft.Json;
 using System.Reflection;
 using System.Text;
 
@@ -13,6 +15,8 @@ Console.WriteLine("Initializing Band Agent...");
 
 var serviceClient = ServiceClient.CreateFromConnectionString(configuration["ServiceConnectionString"]);
 
+var registryManager = RegistryManager.CreateFromConnectionString(configuration["ServiceConnectionString"]);          // Added
+
 var feedbackTask = ReceiveFeedback(serviceClient);    // 2. Uden feedback
 
 while (true)
@@ -21,11 +25,11 @@ while (true)
     Console.Write("> ");
     string? deviceId = Console.ReadLine();
 
-    // await SendCloudToDeviceMessage(serviceClient, deviceId);     // #4
+    await SendCloudToDeviceMessage(serviceClient, deviceId);     
 
-    await CallDirectMethod(serviceClient, deviceId);                // #5
+    //await CallDirectMethod(serviceClient, deviceId);                
 
-    //await UpdateDeviceFirmware(registryManager, deviceId);
+    //await UpdateDeviceFirmware(registryManager, deviceId);                                                          // Added
 }
 
 async Task SendCloudToDeviceMessage(ServiceClient serviceClient, string? deviceId)
@@ -44,13 +48,13 @@ async Task SendCloudToDeviceMessage(ServiceClient serviceClient, string? deviceI
 }
 
 
-static async Task ReceiveFeedback(ServiceClient serviceClient)      // 3. Feedback
+static async Task ReceiveFeedback(ServiceClient serviceClient)      
 {
     var feedbackReceiver = serviceClient.GetFeedbackReceiver();
 
     while (true)
     {
-        var feedbackBatch = await feedbackReceiver.ReceiveAsync();
+        FeedbackBatch feedbackBatch = await feedbackReceiver.ReceiveAsync();
 
         if (feedbackBatch == null) continue;
 
@@ -74,4 +78,41 @@ static async Task CallDirectMethod(ServiceClient serviceClient, string deviceId)
     var response = await serviceClient.InvokeDeviceMethodAsync(deviceId, method);
 
     Console.WriteLine($"Response status: {response.Status}, payload: {response.GetPayloadAsJson()}");
+}
+
+ static async Task UpdateDeviceFirmware(RegistryManager registryManager, string deviceId)                       // Added
+{
+    Twin deviceTwin = await registryManager.GetTwinAsync(deviceId);
+
+    var twinPatch = new
+    {
+        properties = new
+        {
+            desired = new
+            {
+                firmwareVersion = "2.0"
+            }
+        }
+    };
+
+    string twinPatchJson = JsonConvert.SerializeObject(twinPatch);
+
+    await registryManager.UpdateTwinAsync(deviceId, twinPatchJson, deviceTwin.ETag);
+
+    Console.WriteLine($"Firmware update sent to device '{deviceId}'...");
+
+    while (true)
+    {
+        Thread.Sleep(1000);
+
+        deviceTwin = await registryManager.GetTwinAsync(deviceId);
+
+        Console.WriteLine($"Firmware update status: {deviceTwin.Properties.Reported["firmwareUpdateStatus"]}");
+
+        if (deviceTwin.Properties.Reported["firmwareVersion"] == "2.0")
+        {
+            Console.WriteLine("Firmware update complete!");
+            break;
+        }
+    }
 }

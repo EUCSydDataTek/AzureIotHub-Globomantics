@@ -16,21 +16,23 @@ var configuration = new ConfigurationBuilder()
 
 Console.WriteLine("Initializing Band Agent...");
 
-var device = DeviceClient.CreateFromConnectionString(configuration["DeviceConnectionString"]);
+DeviceClient _device = DeviceClient.CreateFromConnectionString(configuration["DeviceConnectionString"]);
 
-await device.OpenAsync();
+TwinCollection _reportedProperties = new TwinCollection();
 
-Task receiveEventsTask = ReceiveEventsTask(device);     // Added #1
+await _device.OpenAsync();
 
-await device.SetMethodHandlerAsync("showMessage", ShowMessage, null); // Added #4
+Task receiveEventsTask = ReceiveEventsTask(_device);     
 
-await device.SetMethodDefaultHandlerAsync(OtherDeviceMethod, null); // Added #4
+await _device.SetMethodHandlerAsync("showMessage", ShowMessage, null); 
+
+await _device.SetMethodDefaultHandlerAsync(OtherDeviceMethod, null); 
 
 Console.WriteLine("Device is connected!");
 
-await UpdateTwin(device);
+await UpdateTwin(_device);                                                          // Added
 
-//await _device.SetDesiredPropertyUpdateCallbackAsync(UpdateProperties, null);
+await _device.SetDesiredPropertyUpdateCallbackAsync(UpdateProperties, null);        // Added
 
 Console.WriteLine("Press a key to perform an action:");
 Console.WriteLine("q: quits");
@@ -38,18 +40,18 @@ Console.WriteLine("h: send happy feedback");
 Console.WriteLine("u: send unhappy feedback");
 Console.WriteLine("e: request emergency help");
 
-var random = new Random();
-var quitRequested = false;
+Random random = new Random();
+bool quitRequested = false;
 
 while (!quitRequested)
 {
     Console.Write("Action? ");
-    var input = Console.ReadKey().KeyChar;
+    char input = Console.ReadKey().KeyChar;
     Console.WriteLine();
 
-    var status = StatusType.NotSpecified;
-    var latitude = random.Next(0, 100);
-    var longitude = random.Next(0, 100);
+    StatusType status = StatusType.NotSpecified;
+    int latitude = random.Next(0, 100);
+    int longitude = random.Next(0, 100);
 
     switch (char.ToLower(input))
     {
@@ -67,41 +69,26 @@ while (!quitRequested)
             break;
     }
 
-    var telemetry = new Telemetry
+    Telemetry telemetry = new Telemetry
     {
         Latitude = latitude,
         Longitude = longitude,
         Status = status
     };
 
- 
     string payload = JsonSerializer.Serialize(telemetry, new JsonSerializerOptions { PropertyNameCaseInsensitive = true });
 
-    var message = new Message(Encoding.ASCII.GetBytes(payload));
+    Message message = new Message(Encoding.ASCII.GetBytes(payload));
 
-    await device.SendEventAsync(message);
+    await _device.SendEventAsync(message);
 
     Console.WriteLine("Message sent!");
 }
 
 Console.WriteLine("Disconnecting...");
 
-
-await UpdateTwin(device);
-
-Console.WriteLine("Press any key to exit...");
-Console.ReadKey();
-
-static async Task UpdateTwin(DeviceClient device)
-{
-    var twinProperties = new TwinCollection();
-    twinProperties["connectionType"] = "wi-fi";
-    twinProperties["connectionStrength"] = "full";
-
-    await device.UpdateReportedPropertiesAsync(twinProperties);
-}
-
-static async Task ReceiveEventsTask(DeviceClient device)    // Added #1
+#region CLOUD-TO-DEVICE MESSAGES
+static async Task ReceiveEventsTask(DeviceClient device)   
 {
     while (true)
     {
@@ -117,6 +104,7 @@ static async Task ReceiveEventsTask(DeviceClient device)    // Added #1
         await device.CompleteAsync(message);
     }
 }
+#endregion
 
 #region DIRECT METHODS
 static Task<MethodResponse> ShowMessage(MethodRequest methodRequest, object userContext)
@@ -124,7 +112,7 @@ static Task<MethodResponse> ShowMessage(MethodRequest methodRequest, object user
     Console.WriteLine("*** MESSAGE RECEIVED ***");
     Console.WriteLine(methodRequest.DataAsJson);
 
-    var responsePayload = Encoding.ASCII.GetBytes("{\"response\": \"Message shown!\"}");
+    byte[] responsePayload = Encoding.ASCII.GetBytes("{\"response\": \"Message shown!\"}");
 
     return Task.FromResult(new MethodResponse(responsePayload, 200));
 }
@@ -136,59 +124,56 @@ static Task<MethodResponse> OtherDeviceMethod(MethodRequest methodRequest, objec
     Console.WriteLine($"Method: {methodRequest.Name}");
     Console.WriteLine($"Payload: {methodRequest.DataAsJson}");
 
-    var responsePayload = Encoding.ASCII.GetBytes("{\"response\": \"The method is not implemented!\"}");
+    byte[] responsePayload = Encoding.ASCII.GetBytes("{\"response\": \"The method is not implemented!\"}");
 
     return Task.FromResult(new MethodResponse(responsePayload, 404));
 }
 #endregion
 
-//static Task UpdateProperties(
-//    TwinCollection desiredProperties,
-//    object userContext)
-//{
-//    var currentFirmwareVersion = (string)_reportedProperties["firmwareVersion"];
-//    var desiredFirmwareVersion = (string)desiredProperties["firmwareVersion"];
+#region DEVICE TWIN PROPERTIES
+async Task UpdateTwin(DeviceClient device)
+{
+    _reportedProperties["firmwareVersion"] = "2.0";
+    _reportedProperties["firmwareUpdateStatus"] = "n/a";
 
-//    if (currentFirmwareVersion != desiredFirmwareVersion)
-//    {
-//        Console.WriteLine($"Firmware update requested.  Current version: '{currentFirmwareVersion}', " +
-//                          $"requested version: '{desiredFirmwareVersion}'");
+    await device.UpdateReportedPropertiesAsync(_reportedProperties);
+}
 
-//        ApplyFirmwareUpdate(desiredFirmwareVersion);
-//    }
+async Task UpdateProperties(TwinCollection desiredProperties, object userContext)
+{
+    var currentFirmwareVersion = (string)_reportedProperties["firmwareVersion"];
+    string desiredFirmwareVersion = (string)desiredProperties["firmwareVersion"];
 
-//    return Task.CompletedTask;
-//}
+    if (currentFirmwareVersion != desiredFirmwareVersion)
+    {
+        Console.WriteLine($"Firmware update requested.  Current version: '{currentFirmwareVersion}', " +
+                          $"requested version: '{desiredFirmwareVersion}'");
 
-//static async Task ApplyFirmwareUpdate(string targetVersion)
-//{
-//    Console.WriteLine("Beginning firmware update...");
+        await ApplyFirmwareUpdate(desiredFirmwareVersion);
+    }
+}
 
-//    _reportedProperties["firmwareUpdateStatus"] =
-//        $"Downloading zip file for firmware {targetVersion}...";
-//    await _device.UpdateReportedPropertiesAsync(_reportedProperties);
-//    Thread.Sleep(5000);
+ async Task ApplyFirmwareUpdate(string targetVersion)
+{
+    Console.WriteLine("Beginning firmware update...");
 
-//    _reportedProperties["firmwareUpdateStatus"] = "Unzipping package...";
-//    await _device.UpdateReportedPropertiesAsync(_reportedProperties);
-//    Thread.Sleep(5000);
+    _reportedProperties["firmwareUpdateStatus"] = $"Downloading zip file for firmware {targetVersion}...";
+    await _device.UpdateReportedPropertiesAsync(_reportedProperties);
+    Thread.Sleep(5000);
 
-//    _reportedProperties["firmwareUpdateStatus"] = "Applying update...";
-//    await _device.UpdateReportedPropertiesAsync(_reportedProperties);
-//    Thread.Sleep(5000);
+    _reportedProperties["firmwareUpdateStatus"] = "Unzipping package...";
+    await _device.UpdateReportedPropertiesAsync(_reportedProperties);
+    Thread.Sleep(5000);
 
-//    Console.WriteLine("Firmware update complete!");
+    _reportedProperties["firmwareUpdateStatus"] = "Applying update...";
+    await _device.UpdateReportedPropertiesAsync(_reportedProperties);
+    Thread.Sleep(5000);
 
-//    _reportedProperties["firmwareUpdateStatus"] = "n/a";
-//    _reportedProperties["firmwareVersion"] = targetVersion;
-//    await _device.UpdateReportedPropertiesAsync(_reportedProperties);
-//}
+    Console.WriteLine("Firmware update complete!");
 
-//private static async Task UpdateTwin(DeviceClient device)
-//{
-//    _reportedProperties = new TwinCollection();
-//    _reportedProperties["firmwareVersion"] = "1.0";
-//    _reportedProperties["firmwareUpdateStatus"] = "n/a";
+    _reportedProperties["firmwareUpdateStatus"] = "n/a";
+    _reportedProperties["firmwareVersion"] = targetVersion;
+    await _device.UpdateReportedPropertiesAsync(_reportedProperties);
+}
+#endregion
 
-//    await device.UpdateReportedPropertiesAsync(_reportedProperties);
-//}
