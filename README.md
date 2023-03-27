@@ -67,8 +67,6 @@ Indkommentér metoden ReceiveFeedback() og test:
 1. Indkommentér metoden `CallDirectMethod()` i BandManager.
 2. Start både BandAgent og BandMangeger og send til `my-device-id`. Virker desværre ikke!
 
-&nbsp;
 
-## 6. Device Twins
 
 
