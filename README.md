@@ -2,7 +2,7 @@
 
 ## 1. BandAgent
 
-Device: `my-device-id`
+Device: `my-device`
 
 Connectionstring findes som *Primary Connectionstring* for my-device-id devicen og er anbragt i *User Secrets*.
 
