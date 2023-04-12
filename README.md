@@ -4,7 +4,7 @@
 
 Device: `my-device`
 
-Connectionstring findes som *Primary Connectionstring* for my-device-id devicen og er anbragt i *User Secrets*.
+Connectionstring findes som *Primary Connectionstring* for my-device devicen og er anbragt i *User Secrets*.
 
 Testes med Azure IoT Explorer, som monitorerer *Event Hub*.
 
