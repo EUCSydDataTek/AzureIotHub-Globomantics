@@ -21,7 +21,7 @@ while (true)
     Console.Write("> ");
     string? deviceId = Console.ReadLine();
 
-    await SendCloudToDeviceMessage(serviceClient, deviceId);     // #2
+    await SendCloudToDeviceMessage(serviceClient, deviceId);     // #2 + #3
 
     //await CallDirectMethod(serviceClient, deviceId);                // #5
 
