@@ -33,15 +33,16 @@ En ny ConsoleApp kaldet **BandManager** er oprettet.
 
 I første omgang er kun metoden `SendCloudToDeviceMessage()` aktiv.
 
-Test multiple startup af både BandAgent og BandManager projekterne og send en meddelelse til `my-device-id`. Den skal dukke op i BandAgent.
+Test multiple startup af både *BandAgent* og *BandManager* projekterne og send en meddelelse til `my-device`. Den skal dukke op i BandAgent.
 
-Derefter lukkes for BandAgent og en ny meddelelse sendes - men her ved vi ikke om den er modtaget!
+Luk begge apps, start kun *BandManager* og send en ny meddelelse - men denne gang ved vi ikke om den er modtaget!
 
 &nbsp;
 
 ## 3. Using Message Feedback
 
-Indkommentér metoden ReceiveFeedback() og test:
+Indkommentér metoden `ReceiveFeedback()` i `BandManager`.
+Start både `BandAgent` og `BandManager` projekterne og test følgende:
 
 - at meddelelsen bliver modtaget
 - at meddelelsen ikke bliver modtaget og timer ud

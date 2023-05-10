@@ -13,7 +13,7 @@ Console.WriteLine("Initializing Band Agent...");
 
 var serviceClient = ServiceClient.CreateFromConnectionString(configuration["ServiceConnectionString"]);
 
-var feedbackTask = ReceiveFeedback(serviceClient);    // 2. Uden feedback
+//var feedbackTask = ReceiveFeedback(serviceClient);    // 2. Uden feedback
 
 while (true)
 {
@@ -21,9 +21,9 @@ while (true)
     Console.Write("> ");
     string? deviceId = Console.ReadLine();
 
-    // await SendCloudToDeviceMessage(serviceClient, deviceId);     // #4
+    await SendCloudToDeviceMessage(serviceClient, deviceId);     // #2
 
-    await CallDirectMethod(serviceClient, deviceId);                // #5
+    //await CallDirectMethod(serviceClient, deviceId);                // #5
 
     //await UpdateDeviceFirmware(registryManager, deviceId);
 }
@@ -44,7 +44,7 @@ async Task SendCloudToDeviceMessage(ServiceClient serviceClient, string? deviceI
 }
 
 
-static async Task ReceiveFeedback(ServiceClient serviceClient)      // 3. Feedback
+static async Task ReceiveFeedback(ServiceClient serviceClient)      // 3.Using Message Feedback
 {
     var feedbackReceiver = serviceClient.GetFeedbackReceiver();
 
