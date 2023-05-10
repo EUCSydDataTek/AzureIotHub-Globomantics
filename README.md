@@ -51,22 +51,22 @@ Start både `BandAgent` og `BandManager` projekterne og test følgende:
 
 ## 4. Receiving Direct Method Calls
 
-1. Indkommentér metoden `ShowMessage()`.
+1. Bemærk metoden `ShowMessage()` i *BandAgent*.
 
-2. Start *BandAgent* og benyt *IoT Hub Explorer* til at kalde **showMessage** med en Payload-message, som en Direct Method på `my-device-id`.
+2. Start *BandAgent* og benyt *IoT Hub Explorer* til at kalde **showMessage** med en Payload-message, som en *Direct Method* på `my-device`.
 
 3. Prøv også at kalde **showUnknownMessage** og bemærk en HTTP 501
 
 4. Indkommentér metoden `OtherDeviceMethod()`.
 
-5. Start *BandAgent* og benyt *IoT Hub Explorer* til at kalde **showUnknownMessage** med en Payload-message, som en Direct Method på `my-device-id`.
+5. Start *BandAgent* og benyt *IoT Hub Explorer* til at kalde **showUnknownMessage** med en Payload-message, som en Direct Method på `my-device`.
 
 &nbsp;
 
-## 5. Call Direct Method from BandManager
+## 5. Call Direct Method from BandManager (virker ikke)
 
 1. Indkommentér metoden `CallDirectMethod()` i BandManager.
-2. Start både BandAgent og BandMangeger og send til `my-device-id`. Virker desværre ikke!
+2. Start både *BandAgent* og *BandManager* og send til `my-device`. Virker desværre ikke!
 
 
 
