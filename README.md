@@ -31,7 +31,7 @@ Test fra VSCode ved at sende en C2D Message to Device.
 
 En ny ConsoleApp kaldet **BandManager** er oprettet.
 
-I første omgang er kun metoden `SendCloudToDeviceMessage()` aktive.
+I første omgang er kun metoden `SendCloudToDeviceMessage()` aktiv.
 
 Test multiple startup af både BandAgent og BandManager projekterne og send en meddelelse til `my-device-id`. Den skal dukke op i BandAgent.
 
