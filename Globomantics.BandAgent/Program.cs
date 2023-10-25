@@ -10,21 +10,21 @@ using Common;
 
 // Connectionstring hentes fra User Secrets. Findes som primary connectionstring for den enkelte device
 
-var configuration = new ConfigurationBuilder()
+IConfigurationRoot configuration = new ConfigurationBuilder()
     .AddUserSecrets(Assembly.GetExecutingAssembly())
     .Build();
 
 Console.WriteLine("Initializing Band Agent...");
 
-var device = DeviceClient.CreateFromConnectionString(configuration["DeviceConnectionString"]);
+DeviceClient device = DeviceClient.CreateFromConnectionString(configuration["DeviceConnectionString"]);
 
 await device.OpenAsync();
 
-Task receiveEventsTask = ReceiveEventsTask(device);     // Added #1
+Task receiveEventsTask = ReceiveEventsTask(device);                     // Added #1
 
-await device.SetMethodHandlerAsync("showMessage", ShowMessage, null); // Added #4
+await device.SetMethodHandlerAsync("showMessage", ShowMessage, null);   // Added #4
 
-await device.SetMethodDefaultHandlerAsync(OtherDeviceMethod, null); // Added #4
+await device.SetMethodDefaultHandlerAsync(OtherDeviceMethod, null);     // Added #4
 
 Console.WriteLine("Device is connected!");
 

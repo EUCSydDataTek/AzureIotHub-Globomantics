@@ -33,15 +33,15 @@ En ny ConsoleApp kaldet **BandManager** er oprettet.
 
 I første omgang er kun metoden `SendCloudToDeviceMessage()` aktive.
 
-Test multiple startup af både BandAgent og BandManager projekterne og send en meddelelse til `my-device-id`. Den skal dukke op i BandAgent.
+Test multiple startup af både **BandAgent** og **BandManager** projekterne og send en meddelelse til `my-device-id`. Den skal dukke op i BandAgent.
 
-Derefter lukkes for BandAgent og en ny meddelelse sendes - men her ved vi ikke om den er modtaget!
+Derefter lukkes for **BandAgent** og en ny meddelelse sendes - men her ved vi ikke om den er modtaget!
 
 &nbsp;
 
 ## 3. Using Message Feedback
 
-Indkommentér metoden ReceiveFeedback() og test:
+Indkommentér metoden `ReceiveFeedback()` og test:
 
 - at meddelelsen bliver modtaget
 - at meddelelsen ikke bliver modtaget og timer ud
@@ -52,9 +52,9 @@ Indkommentér metoden ReceiveFeedback() og test:
 
 1. Indkommentér metoden `ShowMessage()`.
 
-2. Start *BandAgent* og benyt *IoT Hub Explorer* til at kalde **showMessage** med en Payload-message, som en Direct Method på `my-device-id`.
+2. Start *BandAgent* og benyt *IoT Hub Explorer* til at kalde `showMessage()` med en Payload-message, som en Direct Method på `my-device-id`.
 
-3. Prøv også at kalde **showUnknownMessage** og bemærk en HTTP 501
+3. Prøv også at kalde `showUnknownMessage()` og bemærk en `HTTP 501`
 
 4. Indkommentér metoden `OtherDeviceMethod()`.
 
