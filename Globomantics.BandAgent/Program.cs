@@ -101,6 +101,7 @@ static async Task UpdateTwin(DeviceClient device)
     await device.UpdateReportedPropertiesAsync(twinProperties);
 }
 
+#region CLOUD-TO-DEVICE MESSAGES (C2D)
 static async Task ReceiveEventsTask(DeviceClient device)    // Added #1
 {
     while (true)
@@ -117,6 +118,7 @@ static async Task ReceiveEventsTask(DeviceClient device)    // Added #1
         await device.CompleteAsync(message);
     }
 }
+#endregion
 
 #region DIRECT METHODS
 static Task<MethodResponse> ShowMessage(MethodRequest methodRequest, object userContext)
