@@ -8,13 +8,13 @@ using Common;
 
 // Hentes fra User Secrets. Findes som primary connectionstring for den enkelte device
 
-var configuration = new ConfigurationBuilder()
+IConfigurationRoot configuration = new ConfigurationBuilder()
     .AddUserSecrets(Assembly.GetExecutingAssembly())
     .Build();
 
 Console.WriteLine("Initializing Band Agent...");
 
-var device = DeviceClient.CreateFromConnectionString(configuration["DeviceConnectionString"], TransportType.Amqp );
+DeviceClient device = DeviceClient.CreateFromConnectionString(configuration["DeviceConnectionString"], TransportType.Amqp );
 
 await device.OpenAsync();
 
@@ -28,13 +28,13 @@ Console.WriteLine("h: send happy feedback");
 Console.WriteLine("u: send unhappy feedback");
 Console.WriteLine("e: request emergency help");
 
-var random = new Random();
-var quitRequested = false;
+Random random = new Random();
+bool quitRequested = false;
 
 while (!quitRequested)
 {
     Console.Write("Action? ");
-    var input = Console.ReadKey().KeyChar;
+    char input = Console.ReadKey().KeyChar;
     Console.WriteLine();
 
     var status = StatusType.NotSpecified;
@@ -57,7 +57,7 @@ while (!quitRequested)
             break;
     }
 
-    var telemetry = new Telemetry
+    Telemetry telemetry = new Telemetry
     {
         Latitude = latitude,
         Longitude = longitude,
@@ -86,7 +86,7 @@ static async Task UpdateTwin(DeviceClient device)
 {
     var twinProperties = new TwinCollection();
     twinProperties["connectionType"] = "wifi";
-    twinProperties["connectionStrength"] = "full";
+    twinProperties["connectionStrength"] = "low";
 
     await device.UpdateReportedPropertiesAsync(twinProperties);
 }
