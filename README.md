@@ -18,6 +18,14 @@ Menu i BandAgent:
 > 
 > e: request emergency help
 
+#### Device Twin
+Indkommentér koden i `BandAgent` klassen, som opdaterer Device Twin:
+
+```csharp
+await UpdateTwin(device);
+```
+Benyt Azure IoT Explorer til at se ændringen i Device Twin.
+
 &nbsp;
 
 ## 2. MessageProcessor

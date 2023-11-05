@@ -20,7 +20,7 @@ await device.OpenAsync();
 
 Console.WriteLine("Device is connected!");
 
-await UpdateTwin(device);
+// await UpdateTwin(device);
 
 Console.WriteLine("Press a key to perform an action:");
 Console.WriteLine("q: quits");
@@ -75,9 +75,6 @@ while (!quitRequested)
 }
 
 Console.WriteLine("Disconnecting...");
-
-
-await UpdateTwin(device);
 
 Console.WriteLine("Press any key to exit...");
 Console.ReadKey();
