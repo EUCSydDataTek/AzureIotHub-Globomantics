@@ -9,6 +9,7 @@ using Common;
 // Send messages from the cloud to your device with IoT Hub (.NET) https://learn.microsoft.com/en-us/azure/iot-hub/iot-hub-csharp-csharp-c2d)
 
 // Connectionstring hentes fra User Secrets. Findes som primary connectionstring for den enkelte device
+// Device: my-device
 
 IConfigurationRoot configuration = new ConfigurationBuilder()
     .AddUserSecrets(Assembly.GetExecutingAssembly())
@@ -123,7 +124,7 @@ static async Task ReceiveEventsTask(DeviceClient device)    // Added #1
 #region DIRECT METHODS
 static Task<MethodResponse> ShowMessage(MethodRequest methodRequest, object userContext)
 {
-    Console.WriteLine("*** MESSAGE RECEIVED ***");
+    Console.WriteLine("*** DIRECT MESSAGE RECEIVED ***");
     Console.WriteLine(methodRequest.DataAsJson);
 
     var responsePayload = Encoding.ASCII.GetBytes("{\"response\": \"Message shown!\"}");
