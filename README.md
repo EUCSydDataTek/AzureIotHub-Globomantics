@@ -33,18 +33,19 @@ Benyt Azure IoT Explorer til at se ændringen i Device Twin.
 Uden deserilization af Json og med `return Task.CompletedTask` i slutningen 
 af klassen `LoggingEventProcessor` og metoden `ProcessEventsAsync()` :
 
-1. Start MessageProcessor og bemærk at der sikkert allerede ligger en masse messages.
-2. Send nu 10 messages fra VSCode.
-2. Stop og start igen og se at alle gamle samt de 10 nye messages stadig ligger i EventHub.
-3. Udskift `Task.CompletedTask` med `return context.CheckpointAsync()`
-4. Start MessageProcessor igen - alle messages vises stadig
-5. Start MessageProcessor igen - og denne gang flyttes checkpoint korrekt og Eventhub er tom!
+
+1. Sæt **Message Processor** til Startup project.
+1. Start **MessageProcessor** og bemærk at der sikkert allerede ligger en masse messages.
+1. Send nu 10 messages fra VSCode.
+1. Stop og start igen og se at alle gamle samt de 10 nye messages stadig ligger i EventHub.
+1. Udskift `Task.CompletedTask` med `return context.CheckpointAsync()`
+1. Start MessageProcessor igen - alle messages vises stadig
+1. Start MessageProcessor igen - og denne gang flyttes checkpoint korrekt og Eventhub er tom!
 
 &nbsp;
 
 ## 3. Horizontal scaling
 
-Sæt Message Processor til Startup project.
 
 1. Tryk Ctrl + F5 for at starte første instance af Message Processor.
 
