@@ -20,7 +20,7 @@ await device.OpenAsync();
 
 Console.WriteLine("Device is connected!");
 
-// await UpdateTwin(device);
+await UpdateTwin(device);
 
 Console.WriteLine("Press a key to perform an action:");
 Console.WriteLine("q: quits");
@@ -67,7 +67,7 @@ while (!quitRequested)
  
     string payload = JsonSerializer.Serialize(telemetry, new JsonSerializerOptions { PropertyNameCaseInsensitive = true });
 
-    var message = new Message(Encoding.ASCII.GetBytes(payload));
+    Message? message = new Message(Encoding.ASCII.GetBytes(payload));
 
     await device.SendEventAsync(message);
 

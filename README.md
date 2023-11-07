@@ -30,13 +30,15 @@ Benyt Azure IoT Explorer til at se ændringen i Device Twin.
 
 ## 2. MessageProcessor
 
-Uden deserilization af Json og med `return Task.CompletedTask`:
+Uden deserilization af Json og med `return Task.CompletedTask` i slutningen 
+af klassen `LoggingEventProcessor` og metoden `ProcessEventsAsync()` :
 
-1. Start MessageProcessor og send 10 messages fra VSCode.
-2. Stop og start igen og se at alle 10 messages stadig ligger i EventHub.
+1. Start MessageProcessor og bemærk at der sikkert allerede ligger en masse messages.
+2. Send nu 10 messages fra VSCode.
+2. Stop og start igen og se at alle gamle samt de 10 nye messages stadig ligger i EventHub.
 3. Udskift `Task.CompletedTask` med `return context.CheckpointAsync()`
-4. Start MessageProcessor igen - alle 10 vises stadig
-5. Start MessageProcessor igen - og denne gang flyttes checkpoint korrekt.
+4. Start MessageProcessor igen - alle messages vises stadig
+5. Start MessageProcessor igen - og denne gang flyttes checkpoint korrekt og Eventhub er tom!
 
 &nbsp;
 
