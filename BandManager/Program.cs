@@ -15,21 +15,21 @@ Console.WriteLine("Initializing Band Agent...");
 
 var serviceClient = ServiceClient.CreateFromConnectionString(configuration["ServiceConnectionString"]);
 
-var registryManager = RegistryManager.CreateFromConnectionString(configuration["ServiceConnectionString"]);          // Added
+var registryManager = RegistryManager.CreateFromConnectionString(configuration["ServiceConnectionString"]);          // #7 Added
 
-var feedbackTask = ReceiveFeedback(serviceClient);    // 2. Uden feedback
+var feedbackTask = ReceiveFeedback(serviceClient);    
 
 while (true)
 {
-    Console.WriteLine("Which device do you wish to send a message to? ");
+    Console.WriteLine("Which device do you wish to update? ");
     Console.Write("> ");
     string? deviceId = Console.ReadLine();
 
-    await SendCloudToDeviceMessage(serviceClient, deviceId);     
+    //await SendCloudToDeviceMessage(serviceClient, deviceId);     
 
     //await CallDirectMethod(serviceClient, deviceId);                
 
-    //await UpdateDeviceFirmware(registryManager, deviceId);                                                          // Added
+    await UpdateDeviceFirmware(registryManager, deviceId);                                                          // #7 Added
 }
 
 async Task SendCloudToDeviceMessage(ServiceClient serviceClient, string? deviceId)
@@ -46,7 +46,6 @@ async Task SendCloudToDeviceMessage(ServiceClient serviceClient, string? deviceI
 
     await serviceClient.SendAsync(deviceId, commandMessage);
 }
-
 
 static async Task ReceiveFeedback(ServiceClient serviceClient)      
 {
@@ -80,7 +79,7 @@ static async Task CallDirectMethod(ServiceClient serviceClient, string deviceId)
     Console.WriteLine($"Response status: {response.Status}, payload: {response.GetPayloadAsJson()}");
 }
 
- static async Task UpdateDeviceFirmware(RegistryManager registryManager, string deviceId)                       // Added
+ static async Task UpdateDeviceFirmware(RegistryManager registryManager, string deviceId)                       // #7 Added
 {
     Twin deviceTwin = await registryManager.GetTwinAsync(deviceId);
 

@@ -85,6 +85,7 @@ Der er tilføjet nogle update metoder i BandAgent.
 
 1. I Azure IoT Hub og *Shared access policies* udvides *service Policy* med **Registry write**.
 
-2. I BandManager benyttes nu metoden `UpdateDeviceFirmware()`.
+2. I BandAgent abonneres på metoden `UpdateProperties`, som igen kalder ÀpplyFirmwareUpdate()`hvis der ønskes en højere version.
+   I BandManager opdateres Device Twin med en ny højere firmwareVersion og dermed opdateres BandAgent.
 
-3. Både BandAgent og BandManager køres nu. Skriv navnet på devicen i BandManager og processen kan følges.
+3. Både BandAgent og BandManager køres nu. Skriv navnet på devicen i BandManager og processen kan følges i begge ender.

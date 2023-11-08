@@ -24,15 +24,15 @@ await _device.OpenAsync();
 
 Task receiveEventsTask = ReceiveEventsTask(_device);     
 
-await _device.SetMethodHandlerAsync("showMessage", ShowMessage, null); 
+//await _device.SetMethodHandlerAsync("showMessage", ShowMessage, null); 
 
-await _device.SetMethodDefaultHandlerAsync(OtherDeviceMethod, null); 
+//await _device.SetMethodDefaultHandlerAsync(OtherDeviceMethod, null); 
 
 Console.WriteLine("Device is connected!");
 
-await UpdateTwin(_device);                                                          // Added
+await UpdateTwin(_device);                                                          // #7 Added
 
-await _device.SetDesiredPropertyUpdateCallbackAsync(UpdateProperties, null);        // Added
+await _device.SetDesiredPropertyUpdateCallbackAsync(UpdateProperties, null);        // #7 Added
 
 Console.WriteLine("Press a key to perform an action:");
 Console.WriteLine("q: quits");
