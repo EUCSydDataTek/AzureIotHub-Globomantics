@@ -18,12 +18,12 @@ Menu i BandAgent:
 > 
 > e: request emergency help
 
-#### Device Twin
-Indkommentér koden i `BandAgent` klassen, som opdaterer Device Twin:
+### Device Twin
+I Azure IoT Explorer kan to Device Twin ses:
+- connectionType
+- connectionStrength
 
-```csharp
-await UpdateTwin(device);
-```
+Værdierne kan ændres nederst i koden i BandAgent.
 Benyt Azure IoT Explorer til at se ændringen i Device Twin.
 
 &nbsp;

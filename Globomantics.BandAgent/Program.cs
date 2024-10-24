@@ -83,7 +83,7 @@ static async Task UpdateTwin(DeviceClient device)
 {
     var twinProperties = new TwinCollection();
     twinProperties["connectionType"] = "wifi";
-    twinProperties["connectionStrength"] = "low";
+    twinProperties["connectionStrength"] = "high";
 
     await device.UpdateReportedPropertiesAsync(twinProperties);
 }
