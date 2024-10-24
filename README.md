@@ -1,6 +1,6 @@
 # 2.Cloud-to-Device-Messaging
 
-## 1. Receiving Messages on a Device (BandAgent)
+## 1. Receiving Messages on a Device (BandAgent) (demo af afsnit 17)
 
 Følgende metode tilføjes **BandAgent**:
 
@@ -27,7 +27,7 @@ Test fra VSCode ved at sende en C2D Message to Device.
 
 &nbsp;
 
-## 2. Sending Messages from the Cloud
+## 2. Sending Messages from the BandManager
 
 En ny ConsoleApp kaldet **BandManager** er oprettet.
 
