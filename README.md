@@ -1,6 +1,6 @@
 # Globomantics
 
-## 1. BandAgent
+## 1. BandAgent (demo af afsnit 15)
 
 Device: `my-device`
 
@@ -28,7 +28,7 @@ Benyt Azure IoT Explorer til at se ændringen i Device Twin.
 
 &nbsp;
 
-## 2. MessageProcessor
+## 2. MessageProcessor (demo af afsnit 16.1)
 
 Uden deserilization af Json og med `return Task.CompletedTask` i slutningen 
 af klassen `LoggingEventProcessor` og metoden `ProcessEventsAsync()` :
@@ -44,7 +44,7 @@ af klassen `LoggingEventProcessor` og metoden `ProcessEventsAsync()` :
 
 &nbsp;
 
-## 3. Horizontal scaling
+## 3. Horizontal scaling (demo af afsnit 16.2)
 
 
 1. Tryk Ctrl + F5 for at starte første instance af Message Processor.
@@ -65,7 +65,7 @@ før der er gået lidt tid!
 
 &nbsp;
 
-## 4. Device-to-Cloud Messages
+## 4. Device-to-Cloud Messages (demo af afsnit 16.3)
 
 Indkommentér Deserilization-koden ind i `LoggingEventProcessor` klassen.
 
