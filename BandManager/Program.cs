@@ -21,11 +21,9 @@ while (true)
     Console.Write("> ");
     string? deviceId = Console.ReadLine();
 
-    await SendCloudToDeviceMessage(serviceClient, deviceId);     // #2 + #3
+    await SendCloudToDeviceMessage(serviceClient, deviceId);     // #2 
 
-    //await CallDirectMethod(serviceClient, deviceId);                // #5
-
-    //await UpdateDeviceFirmware(registryManager, deviceId);
+    //await CallDirectMethod(serviceClient, deviceId!);          // #4
 }
 
 async Task SendCloudToDeviceMessage(ServiceClient serviceClient, string? deviceId)
@@ -44,7 +42,7 @@ async Task SendCloudToDeviceMessage(ServiceClient serviceClient, string? deviceI
 }
 
 
-static async Task ReceiveFeedback(ServiceClient serviceClient)      // 3.Using Message Feedback
+static async Task ReceiveFeedback(ServiceClient serviceClient)     
 {
     var feedbackReceiver = serviceClient.GetFeedbackReceiver();
 

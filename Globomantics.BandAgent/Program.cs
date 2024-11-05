@@ -1,15 +1,12 @@
-﻿using Microsoft.Azure.Devices.Client;
-using Microsoft.Azure.Devices.Shared;
-using System.Text;
-using System.Text.Json;
+﻿using Common;
+using Microsoft.Azure.Devices.Client;
 using Microsoft.Extensions.Configuration;
 using System.Reflection;
-using Common;
+using System.Text;
+using System.Text.Json;
 
-// Send messages from the cloud to your device with IoT Hub (.NET) https://learn.microsoft.com/en-us/azure/iot-hub/iot-hub-csharp-csharp-c2d)
-
-// Connectionstring hentes fra User Secrets. Findes som primary connectionstring for den enkelte device
 // Device: my-device
+// Connectionstring hentes fra User Secrets. Findes som primary connectionstring for den enkelte device
 
 public class Program
 {
@@ -23,14 +20,11 @@ public class Program
 
         DeviceClient device = DeviceClient.CreateFromConnectionString(configuration["DeviceConnectionString"]);
 
-        await device.OpenAsync();
+        await device.SetReceiveMessageHandlerAsync(OnC2dMessageReceiverAsync, device);      // C2D Message handler
+        await device.SetMethodHandlerAsync("showMessage", ShowMessage, null);               // Direct Method handler
+        await device.SetMethodDefaultHandlerAsync(OtherDeviceMethod, null);                 // All other Direct Methods handler
 
-        Task receiveEventsTask = ReceiveEventsTask(device);                     // Added #1
-
-        await device.SetMethodHandlerAsync("showMessage", ShowMessage, null);   // Added #4
-
-        await device.SetMethodDefaultHandlerAsync(OtherDeviceMethod, null);     // Added #4
-
+        await device.SendEventAsync(new Message(Encoding.ASCII.GetBytes("Device is connected!")));
         Console.WriteLine("Device is connected!");
 
         Console.WriteLine("Press a key to perform an action:");
@@ -75,7 +69,6 @@ public class Program
                 Status = status
             };
 
-
             string payload = JsonSerializer.Serialize(telemetry, new JsonSerializerOptions { PropertyNameCaseInsensitive = true });
 
             var message = new Message(Encoding.ASCII.GetBytes(payload));
@@ -90,21 +83,33 @@ public class Program
 
 
     #region CLOUD-TO-DEVICE MESSAGES (C2D)
-    public static async Task ReceiveEventsTask(DeviceClient device)    // Added #1
+    private static async Task OnC2dMessageReceiverAsync(Message receivedMessage, object userContext)
     {
-        while (true)
+        try
         {
-            Message message = await device.ReceiveAsync();
-
-            if (message == null) continue;
-
-            string payload = Encoding.ASCII.GetString(message.GetBytes());
-            Console.WriteLine($"Received message from cloud: {payload}");
-
-            //await device.RejectAsync(message);
-            //await device.AbandonAsync(message);
-            await device.CompleteAsync(message);
+            PrintMessage(receivedMessage);
+            await ((DeviceClient)userContext).CompleteAsync(receivedMessage);
         }
+        finally
+        {
+            receivedMessage.Dispose();
+        }
+    }
+
+    private static void PrintMessage(Message receivedMessage)
+    {
+        string messageData = Encoding.ASCII.GetString(receivedMessage.GetBytes());
+        var formattedMessage = new StringBuilder($"Received message: [{messageData}]\n");
+
+        // User set application properties can be retrieved from the Message.Properties dictionary.
+        foreach (KeyValuePair<string, string> prop in receivedMessage.Properties)
+        {
+            formattedMessage.AppendLine($"\tProperty: key={prop.Key}, value={prop.Value}");
+        }
+        // System properties can be accessed using their respective accessors, e.g. ContentType.
+        //formattedMessage.AppendLine($"\tContent type: {receivedMessage.ContentType}");
+
+        Console.WriteLine($"{DateTime.Now}> {formattedMessage}");
     }
     #endregion
 
