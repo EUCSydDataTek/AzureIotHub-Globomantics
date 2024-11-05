@@ -25,11 +25,11 @@ public class Program
 
         await device.OpenAsync();
 
-        Task receiveEventsTask = ReceiveEventsTask(device);                     // Added #1
+        Task receiveEventsTask = ReceiveEventsTask(device);                     // Added #1 C2D Method Calls
 
-        await device.SetMethodHandlerAsync("showMessage", ShowMessage, null);   // Added #4
+        await device.SetMethodHandlerAsync("showMessage", ShowMessage, null);   // Added #4 Direct Method Calls
 
-        await device.SetMethodDefaultHandlerAsync(OtherDeviceMethod, null);     // Added #4
+        await device.SetMethodDefaultHandlerAsync(OtherDeviceMethod, null);     // Added #4 Direct Method Calls
 
         Console.WriteLine("Device is connected!");
 
