@@ -21,27 +21,12 @@ while (true)
 {
     Console.WriteLine("Which device do you wish to update? ");
     Console.Write("> ");
-    string? deviceId = Console.ReadLine();               
+    string? deviceId = Console.ReadLine();
 
     await UpdateDeviceFirmware(registryManager, deviceId);                                                          // #7 Added
 }
 
-async Task SendCloudToDeviceMessage(ServiceClient serviceClient, string? deviceId)
-{
-    Console.WriteLine("What message payload do you want to send? ");
-    Console.Write("> ");
-    string? payload = Console.ReadLine();
-
-    Message commandMessage = new Message(Encoding.ASCII.GetBytes(payload!));
-
-    commandMessage.MessageId = Guid.NewGuid().ToString();
-    commandMessage.Ack = DeliveryAcknowledgement.Full;
-    commandMessage.ExpiryTimeUtc = DateTime.UtcNow.AddSeconds(10);
-
-    await serviceClient.SendAsync(deviceId, commandMessage);
-}
-
- static async Task UpdateDeviceFirmware(RegistryManager registryManager, string deviceId)                       // #7 Added
+static async Task UpdateDeviceFirmware(RegistryManager registryManager, string deviceId)                       // #7 Added
 {
     Twin deviceTwin = await registryManager.GetTwinAsync(deviceId);
 
@@ -51,7 +36,7 @@ async Task SendCloudToDeviceMessage(ServiceClient serviceClient, string? deviceI
         {
             desired = new
             {
-                firmwareVersion = "2.0"
+                firmwareVersion = "3.0"
             }
         }
     };
