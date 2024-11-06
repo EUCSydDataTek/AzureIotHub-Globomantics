@@ -15,9 +15,7 @@ Console.WriteLine("Initializing Band Agent...");
 
 var serviceClient = ServiceClient.CreateFromConnectionString(configuration["ServiceConnectionString"]);
 
-var registryManager = RegistryManager.CreateFromConnectionString(configuration["ServiceConnectionString"]);          // #7 Added
-
-var feedbackTask = ReceiveFeedback(serviceClient);    
+var registryManager = RegistryManager.CreateFromConnectionString(configuration["ServiceConnectionString"]);          // #7 Added   
 
 while (true)
 {
