@@ -23,11 +23,7 @@ while (true)
 {
     Console.WriteLine("Which device do you wish to update? ");
     Console.Write("> ");
-    string? deviceId = Console.ReadLine();
-
-    //await SendCloudToDeviceMessage(serviceClient, deviceId);     
-
-    //await CallDirectMethod(serviceClient, deviceId);                
+    string? deviceId = Console.ReadLine();               
 
     await UpdateDeviceFirmware(registryManager, deviceId);                                                          // #7 Added
 }
@@ -45,38 +41,6 @@ async Task SendCloudToDeviceMessage(ServiceClient serviceClient, string? deviceI
     commandMessage.ExpiryTimeUtc = DateTime.UtcNow.AddSeconds(10);
 
     await serviceClient.SendAsync(deviceId, commandMessage);
-}
-
-static async Task ReceiveFeedback(ServiceClient serviceClient)      
-{
-    var feedbackReceiver = serviceClient.GetFeedbackReceiver();
-
-    while (true)
-    {
-        FeedbackBatch feedbackBatch = await feedbackReceiver.ReceiveAsync();
-
-        if (feedbackBatch == null) continue;
-
-        foreach (var record in feedbackBatch.Records)
-        {
-            var messageId = record.OriginalMessageId;
-            var statusCode = record.StatusCode;
-
-            Console.WriteLine($"Feedback for message '{messageId}', status code {statusCode}");
-        }
-        await feedbackReceiver.CompleteAsync(feedbackBatch);
-    }
-}
-
-static async Task CallDirectMethod(ServiceClient serviceClient, string deviceId)
-{
-    var method = new CloudToDeviceMethod("showMessage");
-
-    method.SetPayloadJson("'Hello from C#'");
-
-    var response = await serviceClient.InvokeDeviceMethodAsync(deviceId, method);
-
-    Console.WriteLine($"Response status: {response.Status}, payload: {response.GetPayloadAsJson()}");
 }
 
  static async Task UpdateDeviceFirmware(RegistryManager registryManager, string deviceId)                       // #7 Added
