@@ -7,14 +7,13 @@ using System.Reflection;
 using Common;
 
 // Hentes fra User Secrets. Findes som primary connectionstring for den enkelte device
-
 IConfigurationRoot configuration = new ConfigurationBuilder()
     .AddUserSecrets(Assembly.GetExecutingAssembly())
     .Build();
 
 Console.WriteLine("Initializing Band Agent...");
 
-DeviceClient device = DeviceClient.CreateFromConnectionString(configuration["DeviceConnectionString"], TransportType.Amqp );
+DeviceClient device = DeviceClient.CreateFromConnectionString(configuration["DeviceConnectionString"], TransportType.Amqp);
 
 await device.OpenAsync();
 
@@ -28,46 +27,34 @@ Console.WriteLine("h: send happy feedback");
 Console.WriteLine("u: send unhappy feedback");
 Console.WriteLine("e: request emergency help");
 
-Random random = new Random();
-bool quitRequested = false;
-
-while (!quitRequested)
+StatusType status = StatusType.NotSpecified;
+while (status != StatusType.Quit)
 {
     Console.Write("Action? ");
     char input = Console.ReadKey().KeyChar;
     Console.WriteLine();
+    
+    int latitude = Random.Shared.Next(0, 100);
+    int longitude = Random.Shared.Next(0, 100);
 
-    var status = StatusType.NotSpecified;
-    var latitude = random.Next(0, 100);
-    var longitude = random.Next(0, 100);
-
-    switch (char.ToLower(input))
+    status = char.ToLower(input) switch
     {
-        case 'q':
-            quitRequested = true;
-            break;
-        case 'h':
-            status = StatusType.Happy;
-            break;
-        case 'u':
-            status = StatusType.Unhappy;
-            break;
-        case 'e':
-            status = StatusType.Emergency;
-            break;
-    }
+        'q' => StatusType.Quit,
+        'h' => StatusType.Happy,
+        'u' => StatusType.Unhappy,
+        'e' => StatusType.Emergency,
+        _ => StatusType.NotSpecified
+    };
 
-    Telemetry telemetry = new Telemetry
+    Telemetry telemetry = new()
     {
         Latitude = latitude,
         Longitude = longitude,
         Status = status
     };
-
  
-    string payload = JsonSerializer.Serialize(telemetry, new JsonSerializerOptions { PropertyNameCaseInsensitive = true });
-
-    Message? message = new Message(Encoding.ASCII.GetBytes(payload));
+    string payload = JsonSerializer.Serialize(telemetry);
+    Message message = new(Encoding.ASCII.GetBytes(payload));
 
     await device.SendEventAsync(message);
 
@@ -78,12 +65,15 @@ Console.WriteLine("Disconnecting...");
 
 Console.WriteLine("Press any key to exit...");
 Console.ReadKey();
+return;
 
 static async Task UpdateTwin(DeviceClient device)
 {
-    var twinProperties = new TwinCollection();
-    twinProperties["connectionType"] = "wifi";
-    twinProperties["connectionStrength"] = "high";
+    TwinCollection twinProperties = new()
+    {
+        ["connectionType"] = "wifi",
+        ["connectionStrength"] = "high"
+    };
 
     await device.UpdateReportedPropertiesAsync(twinProperties);
 }

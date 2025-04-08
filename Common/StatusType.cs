@@ -4,5 +4,6 @@ public enum StatusType
     NotSpecified,
     Happy,
     Unhappy,
-    Emergency
+    Emergency,
+    Quit
 }

@@ -1,59 +1,73 @@
-﻿using Common;
-using Microsoft.Azure.EventHubs;
-using Microsoft.Azure.EventHubs.Processor;
-using Newtonsoft.Json;
-using System.Text;
+﻿using System.Text;
+using System.Text.Json;
+using Azure.Messaging.EventHubs;
+using Azure.Messaging.EventHubs.Processor;
 
-public class LoggingEventProcessor : IEventProcessor
+namespace MessageProcessor;
+
+public sealed class LoggingEventProcessor : IDisposable
 {
-    public Task OpenAsync(PartitionContext context)
+    private readonly EventProcessorClient _processor;
+    private static readonly JsonSerializerOptions JsonSerializerOptions = new JsonSerializerOptions
+    {
+        PropertyNamingPolicy = JsonNamingPolicy.CamelCase
+    };
+    
+    public LoggingEventProcessor(EventProcessorClient processor)
+    {
+        _processor = processor ?? throw new ArgumentNullException(nameof(processor));
+        
+        _processor.ProcessEventAsync += ProcessEventsAsync;
+        _processor.ProcessErrorAsync += ProcessErrorAsync;
+        _processor.PartitionInitializingAsync += OpenAsync;
+        _processor.PartitionClosingAsync += CloseAsync;
+    }
+    
+    private static Task OpenAsync(PartitionInitializingEventArgs args)
     {
         Console.WriteLine("LoggingEventProcessor opened, processing partition: " +
-                          $"'{context.PartitionId}'");
+                          $"'{args.PartitionId}'");
+        
         return Task.CompletedTask;
     }
 
-    public Task CloseAsync(PartitionContext context, CloseReason reason)
+    private static Task CloseAsync(PartitionClosingEventArgs args)
     {
         Console.WriteLine("LoggingEventProcessor closing, partition: " +
-                          $"'{context.PartitionId}', reason: '{reason}'.");
+                          $"'{args.PartitionId}', reason: '{args.Reason}'.");
+                          
         return Task.CompletedTask;
     }
-
-    public Task ProcessErrorAsync(PartitionContext context, Exception error)
+    
+    private static Task ProcessErrorAsync(ProcessErrorEventArgs args)
     {
         Console.WriteLine("LoggingEventProcessor error, partition: " +
-                          $"{context.PartitionId}, error: {error.Message}");
+                          $"{args.PartitionId}, error: {args.Exception.Message}");
+        
         return Task.CompletedTask;
     }
-
-    public Task ProcessEventsAsync(PartitionContext context, IEnumerable<EventData> messages)
+    
+    private static Task ProcessEventsAsync(ProcessEventArgs args)
     {
-        Console.WriteLine($"Batch of events received on partition '{context.PartitionId}'.");
+        Console.WriteLine($"Event received on partition '{args.Partition.PartitionId}'.");
 
         try
         {
-            foreach (var eventData in messages)
-            {
-                var payload = Encoding.ASCII.GetString(eventData.Body.Array!,
-                    eventData.Body.Offset,
-                    eventData.Body.Count);
+            EventData? eventData = args.Data;
+            string payload = Encoding.ASCII.GetString(eventData.Body.ToArray(),0, eventData.Body.Length);
+            object? deviceId = eventData.SystemProperties["iothub-connection-device-id"];
+            
+            Console.WriteLine($"Message received on partition '{args.Partition.PartitionId}', " +
+                              $"device ID: '{deviceId}', " +
+                              $"payload: '{payload}'");
 
-                var deviceId = eventData.SystemProperties["iothub-connection-device-id"];
-
-                Console.WriteLine($"Message received on partition '{context.PartitionId}', " +
-                                  $"device ID: '{deviceId}', " +
-                                  $"payload: '{payload}'");
-
-                // 4. Device-to-Cloud Messages
-                //var telemetry = JsonConvert.DeserializeObject<Telemetry>(payload);
-
-                //if (telemetry.Status == StatusType.Emergency)
-                //{
-                //    Console.WriteLine($"Guest requires emergency assistance! Device ID: {deviceId}");
-                //    SendFirstRespondersTo(telemetry.Latitude, telemetry.Longitude);
-                //}
-            }
+            // 4. Device-to-Cloud Messages
+            // Telemetry? telemetry = JsonSerializer.Deserialize<Telemetry>(payload, JsonSerializerOptions);
+            // if (telemetry?.Status == StatusType.Emergency)
+            // {
+            //     Console.WriteLine($"Guest requires emergency assistance! Device ID: {deviceId}");
+            //     SendFirstRespondersTo(telemetry.Latitude, telemetry.Longitude);
+            // }
         }
         catch (Exception ex)
         {
@@ -61,11 +75,19 @@ public class LoggingEventProcessor : IEventProcessor
         }
 
         return Task.CompletedTask;        // 2. MessageProcessor
-        //return context.CheckpointAsync();
+        //return args.UpdateCheckpointAsync();
     }
-
-    private void SendFirstRespondersTo(decimal latitude, decimal longitude)
+    
+    private static void SendFirstRespondersTo(decimal latitude, decimal longitude)
     {
         Console.WriteLine($"**First responders dispatched to ({latitude}, {longitude})!**");
+    }
+
+    public void Dispose()
+    {
+        _processor.ProcessEventAsync -= ProcessEventsAsync;
+        _processor.ProcessErrorAsync -= ProcessErrorAsync;
+        _processor.PartitionInitializingAsync -= OpenAsync;
+        _processor.PartitionClosingAsync -= CloseAsync;
     }
 }
