@@ -1,7 +1,9 @@
-﻿using Microsoft.Azure.EventHubs;
-using Microsoft.Azure.EventHubs.Processor;
-using Microsoft.Extensions.Configuration;
+﻿using Microsoft.Extensions.Configuration;
 using System.Reflection;
+using Azure.Messaging.EventHubs;
+using Azure.Messaging.EventHubs.Consumer;
+using Azure.Storage.Blobs;
+using MessageProcessor;
 
 /*   HubName og IoTHubConnectionstring findes her: Hub settings | Built-in endpoints | Event Hub-compatible name and endpoint
      Inden projektet kan køres, skal der oprettes en ny Blob Container, der kaldes message-processor-host og gemmer checkpoints for EventHub.
@@ -15,23 +17,31 @@ using System.Reflection;
      }
 */
 
-var configuration = new ConfigurationBuilder()
+IConfigurationRoot configuration = new ConfigurationBuilder()
     .AddUserSecrets(Assembly.GetExecutingAssembly())
     .Build();
 
-var storageContainerName = "message-processor-host";
-var consumerGroupName = PartitionReceiver.DefaultConsumerGroupName;
+const string storageContainerName = "message-processor-host";
+const string consumerGroupName = EventHubConsumerClient.DefaultConsumerGroupName;
 
-var processor = new EventProcessorHost(
-    configuration["HubName"],
-    consumerGroupName,
-    configuration["IotHubConnectionString"],
+// Create a BlobContainerClient to interact with the storage container
+BlobContainerClient storageClient = new(
     configuration["storageConnectionString"],
     storageContainerName);
 
-await processor.RegisterEventProcessorAsync<LoggingEventProcessor>();
+// Create the EventProcessorClient
+EventProcessorClient processor = new(
+    storageClient,
+    consumerGroupName,
+    configuration["IotHubConnectionString"],
+    configuration["HubName"]);
+
+// Create the LoggingEventProcessor
+using LoggingEventProcessor loggingEventProcessor = new(processor);
+
+await processor.StartProcessingAsync();
 
 Console.WriteLine("Event processor started, press enter to exit...");
 Console.ReadLine();
 
-await processor.UnregisterEventProcessorAsync();
+await processor.StopProcessingAsync();
