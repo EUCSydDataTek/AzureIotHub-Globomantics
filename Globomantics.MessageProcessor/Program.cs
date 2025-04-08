@@ -43,3 +43,5 @@ await processor.StartProcessingAsync();
 
 Console.WriteLine("Event processor started, press enter to exit...");
 Console.ReadLine();
+
+await processor.StopProcessingAsync();
