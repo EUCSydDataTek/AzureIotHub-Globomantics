@@ -56,6 +56,8 @@ I første omgang er kun metoden `SendCloudToDeviceMessage()` aktiv.
 
 Test multiple startup af både *BandAgent* og *BandManager* projekterne og send en meddelelse til `my-device`. Den skal dukke op i BandAgent.
 
+Derefter indkobles ReceiveFeedback() i linje 16. Start nu kun BandManager op og send message til BandAgent - vent 10 sekunder og se Feedback med status code Expired.
+
 &nbsp;
 
 
